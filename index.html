@@ -492,6 +492,21 @@ function buildReset(){
   make("Nullstill alle", spots.map(s=>s.id));
 }
 
+/* ---------- automatisk oppdatering av sida ---------- */
+const BUILD = "2026-09-19-8";
+let checking=false;
+async function checkUpdate(){
+  if(checking) return; checking=true;
+  try{
+    const r=await fetch(location.pathname+"?_="+Date.now(),{cache:"no-store"});
+    if(r.ok){ const m=(await r.text()).match(/const BUILD = "([^"]+)"/);
+      if(m && m[1]!==BUILD){ lsSet(LS_STATE,JSON.stringify(state)); const u=new URL(location.href); u.searchParams.set("v",m[1]); location.replace(u.toString()); return; } }
+  }catch(e){}
+  checking=false;
+}
+setInterval(checkUpdate,60000);
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") checkUpdate(); });
+
 /* ---------- start ---------- */
 buildSummary(); buildMap(); buildReset(); renderNamebar(); renderNow(); updateConn(); connect();
 </script>
