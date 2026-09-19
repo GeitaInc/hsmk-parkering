@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="nn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a4d9c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Parkering">
+<title>Parkering HSMK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;800;900&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%230a4d9c'/%3E%3Ctext x='32' y='48' font-family='Arial' font-weight='900' font-size='46' fill='white' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --ground:#e9edf1; --surface:#ffffff; --ink:#15202b; --ink-2:#4d5b69; --line:#d3dae1;
+  --sign:#0a4d9c; --sign-ink:#ffffff;
+  --asphalt:#454a51; --asphalt-edge:#2f3338; --paint:#f3f3ee;
+  --free:#1e9a53; --free-soft:#d8f1e2; --occ:#d23f3a; --occ-soft:#f8dcda; --warn:#d99100; --warn-soft:#fbeccb;
+  --car:#c9362f; --car-glass:#f2c4c1;
+  --shadow:0 1px 2px rgba(10,30,60,.08),0 4px 14px rgba(10,30,60,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --ground:#0e141a; --surface:#18212b; --ink:#e8eef4; --ink-2:#9aa8b6; --line:#2a3642;
+    --sign:#2f73c9; --sign-ink:#ffffff;
+    --asphalt:#2c3137; --asphalt-edge:#1b1f24; --paint:#dcdcd4;
+    --free:#3cc378; --free-soft:#163826; --occ:#f0625c; --occ-soft:#3d1c1b; --warn:#f0b43a; --warn-soft:#3b2d10;
+    --car:#e0544d; --car-glass:#5a2523;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--ground); color:var(--ink);
+  font-family:"Overpass",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:15px; line-height:1.4; -webkit-text-size-adjust:100%;
+  padding:0 16px calc(24px + env(safe-area-inset-bottom,0px));
+  font-variant-numeric:tabular-nums;
+}
+.wrap{max-width:720px;margin:0 auto}
+button{font:inherit;color:inherit}
+button,[role=button]{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:3px solid var(--sign);outline-offset:2px}
+
+/* Header */
+header.top{display:flex;align-items:center;gap:12px;padding-top:calc(12px + env(safe-area-inset-top,0px));padding-bottom:10px}
+.psign{flex:none;width:40px;height:40px;border-radius:7px;background:var(--sign);color:var(--sign-ink);display:grid;place-items:center;font-weight:900;font-size:30px;line-height:1;padding-top:4px;box-shadow:inset 0 0 0 2px rgba(255,255,255,.9),0 0 0 1px var(--sign)}
+.titles{flex:1;min-width:0}
+.titles h1{margin:0;font-size:19px;font-weight:800;letter-spacing:.01em;line-height:1.15}
+.titles p{margin:0;color:var(--ink-2);font-size:13px}
+.conn{flex:none;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--ink-2);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 10px 4px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--warn);flex:none}
+.conn[data-s=ok] .dot{background:var(--free)}
+.conn[data-s=off] .dot{background:var(--occ)}
+.conn[data-s=wait] .dot{animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.3}}
+@media (prefers-reduced-motion:reduce){.conn[data-s=wait] .dot{animation:none}}
+
+/* Summary */
+.summary{position:sticky;top:0;z-index:5;background:var(--ground);padding:6px 0 10px;margin:0 -16px;padding-left:16px;padding-right:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lotcard{all:unset;cursor:pointer;background:var(--surface);border-radius:12px;box-shadow:var(--shadow);padding:8px 10px 10px;display:grid;gap:5px;border:2px solid transparent;min-width:0}
+.lotcard:focus-visible{outline:3px solid var(--sign);outline-offset:2px}
+.lotcard .row1{display:flex;align-items:center;gap:6px;min-width:0}
+.lotcard .tag{flex:none;background:var(--sign);color:var(--sign-ink);font-weight:900;font-size:13px;border-radius:5px;padding:3px 6px 1px;line-height:1.2}
+.lotcard .nm{font-size:13px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lotcard .big{display:flex;align-items:center;gap:6px}
+.lotcard .num{font-size:34px;font-weight:900;line-height:1;padding-top:3px}
+.lotcard .of{font-size:13px;color:var(--ink-2);line-height:1.2}
+.bar{height:6px;border-radius:3px;background:var(--free-soft);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--occ);border-radius:3px;transition:width .25s}
+.chip{margin-left:auto;flex:none;font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-radius:5px;padding:3px 7px 1px}
+.chip[data-k=ok]{background:var(--free-soft);color:var(--free)}
+.chip[data-k=warn]{background:var(--warn-soft);color:var(--warn)}
+.chip[data-k=full]{background:var(--occ);color:#fff}
+.lotcard[data-k=full]{border-color:var(--occ)}
+.lotcard[data-k=full] .num{color:var(--occ)}
+
+/* Lots */
+.hint{margin:4px 0 12px;color:var(--ink-2);font-size:13px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink-2);margin:0 0 10px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend b{display:inline-block;width:14px;height:14px;border-radius:3px}
+section.lot{margin:0 0 22px;scroll-margin-top:130px}
+section.lot h2{display:flex;align-items:center;gap:8px;margin:0 0 8px;font-size:17px;font-weight:800}
+section.lot h2 .tag{background:var(--sign);color:var(--sign-ink);font-weight:900;font-size:14px;border-radius:5px;padding:3px 7px 1px}
+section.lot h2 .cnt{margin-left:auto;font-size:14px;font-weight:600;color:var(--ink-2)}
+.mapbox{background:var(--surface);border-radius:12px;box-shadow:var(--shadow);padding:8px;overflow:hidden}
+svg.map{display:block;width:100%;height:auto;user-select:none;-webkit-user-select:none}
+.spot{cursor:pointer}
+.spot .bay{fill:var(--free-soft);stroke:var(--paint);stroke-width:1.6}
+.spot .carbody{fill:var(--car);opacity:0;transition:opacity .15s}
+.spot .glass{fill:var(--car-glass);opacity:0;transition:opacity .15s}
+.spot.occ .bay{fill:var(--occ-soft)}
+.spot.occ .carbody,.spot.occ .glass{opacity:1}
+.spot .n{font-size:12px;font-weight:800;fill:var(--free);pointer-events:none;text-anchor:middle;dominant-baseline:central}
+.spot.occ .n{fill:#fff}
+.spot.flash .bay{stroke:var(--sign);stroke-width:3.5}
+.asph{fill:var(--asphalt);stroke:var(--asphalt-edge);stroke-width:2}
+.maplabel{font-size:12px;font-weight:700;fill:var(--ink-2);text-anchor:middle}
+.maplabel.onasph{fill:var(--paint);opacity:.85}
+.arrow{fill:var(--paint);opacity:.8}
+
+/* Log */
+.panel{background:var(--surface);border-radius:12px;box-shadow:var(--shadow);padding:12px 14px;margin:0 0 14px}
+.panel h3{margin:0 0 6px;font-size:14px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-2)}
+.log{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.log li{display:flex;gap:10px;align-items:baseline;font-size:14px}
+.log time{flex:none;color:var(--ink-2);font-size:13px;width:42px}
+.log .st-occ{color:var(--occ);font-weight:700}
+.log .st-free{color:var(--free);font-weight:700}
+.log .who{color:var(--ink-2);font-size:13px;margin-left:auto;white-space:nowrap}
+.empty{color:var(--ink-2);font-size:14px;margin:0}
+
+/* Settings */
+details.panel summary{cursor:pointer;font-weight:800;font-size:14px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-2);list-style:none}
+details.panel summary::-webkit-details-marker{display:none}
+details.panel summary::after{content:" ▾"}
+details[open].panel summary::after{content:" ▴"}
+.field{display:grid;gap:4px;margin:12px 0}
+.field label{font-size:13px;font-weight:700}
+input[type=text]{font:inherit;font-size:16px;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--ground);color:var(--ink);width:100%}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.btn{border:1px solid var(--line);background:var(--ground);border-radius:8px;padding:9px 12px 7px;font-weight:700;font-size:14px;cursor:pointer}
+.btn.primary{background:var(--sign);border-color:var(--sign);color:var(--sign-ink)}
+.btn.danger{color:var(--occ)}
+.btn.danger.armed{background:var(--occ);border-color:var(--occ);color:#fff}
+.small{font-size:12px;color:var(--ink-2);margin:6px 0 0;overflow-wrap:anywhere}
+
+/* Name banner */
+.namebar{display:flex;gap:8px;align-items:center;background:var(--surface);border-radius:12px;box-shadow:var(--shadow);padding:10px 12px;margin:0 0 12px}
+.namebar input{flex:1;min-width:0;padding:8px 10px}
+.namebar p{margin:0 0 6px;font-size:13px;font-weight:700}
+
+/* Toast */
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:20;background:var(--ink);color:var(--ground);border-radius:10px;padding:10px 10px 10px 14px;display:flex;gap:12px;align-items:center;box-shadow:0 6px 24px rgba(0,0,0,.25);max-width:calc(100% - 32px);font-size:14px;font-weight:600}
+.toast button{border:0;background:var(--sign);color:#fff;border-radius:7px;padding:7px 12px 5px;font-weight:800;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="psign" aria-hidden="true">P</div>
+    <div class="titles">
+      <h1>Parkering</h1>
+      <p id="subtitle">Loppemarknad HSMK · Stasjonsfjellet skole</p>
+    </div>
+    <div class="conn" id="conn" data-s="wait" role="status" aria-live="polite"><span class="dot"></span><span id="connText">Koplar til…</span></div>
+  </header>
+
+  <div class="summary" id="summary"></div>
+
+  <div id="namebarHost"></div>
+
+  <p class="hint">Trykk på ein plass når ein bil parkerer. Trykk igjen når han køyrer. Alle ser endringa med ein gong.</p>
+  <div class="legend" aria-hidden="true">
+    <span><b style="background:var(--free-soft);outline:1.5px solid var(--free)"></b>Ledig</span>
+    <span><b style="background:var(--car)"></b>Oppteken</span>
+  </div>
+
+  <div id="lots"></div>
+
+  <div class="panel">
+    <h3>Siste endringar</h3>
+    <ul class="log" id="log"></ul>
+  </div>
+
+  <details class="panel" id="settings">
+    <summary>Innstillingar</summary>
+    <div class="field">
+      <label for="nameInput">Namnet ditt (visast ved endringane dine)</label>
+      <input type="text" id="nameInput" autocomplete="given-name" maxlength="24" placeholder="t.d. Tarjei">
+    </div>
+    <div class="btnrow">
+      <button class="btn primary" id="shareBtn" type="button">Del lenkja</button>
+    </div>
+    <p class="small" style="margin-top:14px"><b>Nullstill</b> – set alle plassane som ledige (t.d. ved oppstart). Trykk to gonger.</p>
+    <div class="btnrow" id="resetRow"></div>
+    <p class="small" id="diag"></p>
+  </details>
+</div>
+
+<div id="toastHost"></div>
+
+<script src="mqtt.min.js"></script>
+<script>
+"use strict";
+/* ============================================================
+   LAYOUT – parkeringane. Kvar rad = plassar side om side langs ei linje.
+   x,y = startpunkt · a = vinkel (grader) · n = tal plassar
+   side = 1 (plassane går «nedover» frå linja) eller -1 (oppover)
+   ============================================================ */
+const SW = 34;   // plassbreidd (einingar)
+const SD = 56;   // plassdjupn
+
+const LOTS = [
+  { id:"p1", tag:"P1", name:"Parkering 1",
+    outline:[[0,0],[372,0],[372,300],[0,300]],
+    rows:[
+      {x:16, y:10,  a:0, n:10, side:1},
+      {x:16, y:170, a:0, n:10, side:-1},
+      {x:16, y:176, a:0, n:10, side:1},
+    ],
+    labels:[{x:186,y:128,text:"køyrefelt",onAsph:true}, {x:186,y:290,text:"",onAsph:true}]
+  },
+  { id:"p2", tag:"P2", name:"Parkering 2",
+    outline:[[0,0],[372,0],[372,214],[0,214]],
+    rows:[
+      {x:16, y:10,  a:0, n:10, side:1},
+      {x:16, y:204, a:0, n:10, side:-1},
+    ],
+    labels:[{x:186,y:112,text:"køyrefelt",onAsph:true}]
+  }
+];
+
+/* ============================================================ SYNK */
+const params = new URLSearchParams(location.search);
+const ROOM = "hsmk-parkering-c9f03b3608" + (params.get("rom") ? "-" + params.get("rom").replace(/[^a-z0-9-]/gi,"") : "");
+const BROKERS = [
+  {name:"HiveMQ", url:"wss://broker.hivemq.com:8884/mqtt"},
+  {name:"EMQX",   url:"wss://broker.emqx.io:8084/mqtt"},
+];
+const LS_STATE = "park:" + ROOM, LS_NAME = "park:name";
+
+function lsGet(k){ try{ return localStorage.getItem(k) }catch(e){ return null } }
+function lsSet(k,v){ try{ localStorage.setItem(k,v) }catch(e){} }
+
+let me = (lsGet(LS_NAME) || "").trim();
+/** state[spotId] = {o:0|1, t:ms, by:string} */
+let state = {};
+try{ state = JSON.parse(lsGet(LS_STATE) || "{}") || {} }catch(e){ state = {} }
+const brokerSeen = BROKERS.map(()=>({}));  // kva kvar broker har fortalt oss
+const clients = [];
+const connected = BROKERS.map(()=>false);
+
+/* ---------- geometri ---------- */
+const rad = d => d*Math.PI/180;
+function rowPoint(r,u,v){ const c=Math.cos(rad(r.a)), s=Math.sin(rad(r.a)); return [r.x+u*c-v*s, r.y+u*s+v*c]; }
+const spots = [];          // {id, lot, num, row, k}
+const spotsByLot = {};
+LOTS.forEach(L=>{
+  spotsByLot[L.id]=[]; let num=1;
+  L.rows.forEach(r=>{ for(let k=0;k<r.n;k++){ const s={id:L.id+"-"+num, lot:L, num, row:r, k}; spots.push(s); spotsByLot[L.id].push(s); num++; } });
+});
+const spotById = Object.fromEntries(spots.map(s=>[s.id,s]));
+
+/* ---------- teikning ---------- */
+const NS="http://www.w3.org/2000/svg";
+function el(tag,attrs,parent){ const e=document.createElementNS(NS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(parent) parent.appendChild(e); return e; }
+const spotEls = {};
+
+function buildLots(){
+  const host=document.getElementById("lots");
+  LOTS.forEach(L=>{
+    const sec=document.createElement("section"); sec.className="lot"; sec.id="lot-"+L.id;
+    sec.innerHTML=`<h2><span class="tag">${L.tag}</span><span>${L.name}</span><span class="cnt" id="cnt-${L.id}"></span></h2><div class="mapbox"></div>`;
+    host.appendChild(sec);
+    // bounds
+    const pts=[...L.outline];
+    L.rows.forEach(r=>{ const side=r.side||1; [[0,0],[r.n*SW,0],[0,side*SD],[r.n*SW,side*SD]].forEach(([u,v])=>pts.push(rowPoint(r,u,v))); });
+    (L.labels||[]).forEach(l=>pts.push([l.x,l.y]));
+    const xs=pts.map(p=>p[0]), ys=pts.map(p=>p[1]);
+    const pad=6, minX=Math.min(...xs)-pad, minY=Math.min(...ys)-pad, W=Math.max(...xs)-minX+pad, H=Math.max(...ys)-minY+pad;
+    const svg=el("svg",{class:"map",viewBox:`${minX} ${minY} ${W} ${H}`,role:"group","aria-label":`${L.tag} ${L.name}`});
+    sec.querySelector(".mapbox").appendChild(svg);
+    el("polygon",{class:"asph",points:L.outline.map(p=>p.join(",")).join(" ")},svg);
+    (L.labels||[]).forEach(l=>{ if(!l.text) return; const t=el("text",{class:"maplabel"+(l.onAsph?" onasph":""),x:l.x,y:l.y},svg); t.textContent=l.text; });
+    spotsByLot[L.id].forEach(s=>{
+      const r=s.row, side=r.side||1;
+      const g=el("g",{class:"spot",role:"button",tabindex:"0","data-id":s.id},svg);
+      const rg=el("g",{transform:`translate(${r.x} ${r.y}) rotate(${r.a})`},g);
+      const y0 = side>0?0:-SD;
+      el("rect",{class:"bay",x:s.k*SW,y:y0,width:SW,height:SD},rg);
+      // bil: kropp + frontrute (fronten mot køyrefeltet, dvs. borte frå linja)
+      el("rect",{class:"carbody",x:s.k*SW+4,y:y0+5,width:SW-8,height:SD-10,rx:6},rg);
+      const gy = side>0 ? y0+SD-19 : y0+9;
+      el("rect",{class:"glass",x:s.k*SW+7,y:gy,width:SW-14,height:10,rx:3},rg);
+      const [cx,cy]=rowPoint(r,(s.k+.5)*SW,side*SD/2);
+      const t=el("text",{class:"n",x:cx,y:cy},g); t.textContent=s.num;
+      spotEls[s.id]=g;
+    });
+    svg.addEventListener("click",e=>{ const g=e.target.closest(".spot"); if(g) toggle(g.dataset.id); });
+    svg.addEventListener("keydown",e=>{ if((e.key==="Enter"||e.key===" ") && e.target.classList.contains("spot")){ e.preventDefault(); toggle(e.target.dataset.id); } });
+  });
+}
+
+function buildSummary(){
+  const host=document.getElementById("summary");
+  LOTS.forEach(L=>{
+    const b=document.createElement("button"); b.type="button"; b.className="lotcard"; b.id="card-"+L.id;
+    b.innerHTML=`<div class="row1"><span class="tag">${L.tag}</span><span class="nm">${L.name}</span></div>
+      <div class="big"><span class="num" id="free-${L.id}">–</span><span class="of" id="of-${L.id}">ledige</span><span class="chip" id="chip-${L.id}" data-k="ok">Ledig</span></div>
+      <div class="bar"><i id="bar-${L.id}" style="width:0"></i></div>`;
+    b.addEventListener("click",()=>document.getElementById("lot-"+L.id).scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"}));
+    host.appendChild(b);
+  });
+}
+
+function isOcc(id){ return !!(state[id] && state[id].o); }
+
+function renderSpot(id){ const g=spotEls[id]; if(!g) return; const o=isOcc(id); g.classList.toggle("occ",o);
+  const s=spotById[id]; g.setAttribute("aria-label",`${s.lot.tag} plass ${s.num}: ${o?"oppteken":"ledig"}`); }
+
+function renderCounts(){
+  LOTS.forEach(L=>{
+    const list=spotsByLot[L.id], total=list.length, occ=list.filter(s=>isOcc(s.id)).length, free=total-occ;
+    const k = free===0 ? "full" : (free <= Math.max(2, Math.round(total*0.1)) ? "warn" : "ok");
+    document.getElementById("free-"+L.id).textContent=free;
+    document.getElementById("of-"+L.id).innerHTML=`ledige<br>av ${total}`;
+    document.getElementById("bar-"+L.id).style.width=(total?occ/total*100:0)+"%";
+    const chip=document.getElementById("chip-"+L.id); chip.dataset.k=k; chip.textContent= k==="full"?"Fullt":k==="warn"?"Nesten fullt":"Ledig";
+    document.getElementById("card-"+L.id).dataset.k=k;
+    document.getElementById("cnt-"+L.id).textContent=`${free} ledige, ${occ} opptekne`;
+  });
+}
+
+function hhmm(t){ const d=new Date(t); return d.toLocaleTimeString("nb-NO",{hour:"2-digit",minute:"2-digit"}); }
+function esc(s){ return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function renderLog(){
+  const items=Object.entries(state).filter(([id,v])=>spotById[id] && v && v.t>0).sort((a,b)=>b[1].t-a[1].t).slice(0,8);
+  const ul=document.getElementById("log");
+  if(!items.length){ ul.innerHTML=`<li><p class="empty">Ingen endringar enno.</p></li>`; return; }
+  ul.innerHTML=items.map(([id,v])=>{ const s=spotById[id];
+    return `<li><time>${hhmm(v.t)}</time><span>${s.lot.tag} nr ${s.num} → <span class="${v.o?"st-occ":"st-free"}">${v.o?"oppteken":"ledig"}</span></span><span class="who">${esc(v.by||"")}</span></li>`; }).join("");
+}
+
+let renderQueued=false;
+function renderAll(){ if(renderQueued) return; renderQueued=true; requestAnimationFrame(()=>{ renderQueued=false; spots.forEach(s=>renderSpot(s.id)); renderCounts(); renderLog(); }); }
+let saveTimer=null;
+function saveLocal(){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>lsSet(LS_STATE,JSON.stringify(state)),300); }
+
+/* ---------- MQTT ---------- */
+const topicFor = id => `${ROOM}/s/${id}`;
+function publishTo(i,id,val){ const c=clients[i]; if(!c) return; c.publish(topicFor(id),JSON.stringify(val),{qos:1,retain:true}); brokerSeen[i][id]=val; }
+function publishAll(id,val){ BROKERS.forEach((_,i)=>publishTo(i,id,val)); }
+
+function accept(id,val){
+  if(!spotById[id] || !val || typeof val.t!=="number") return false;
+  const cur=state[id];
+  if(!cur || val.t>cur.t || (val.t===cur.t && (val.o|0)>(cur.o|0))){ state[id]={o:val.o?1:0,t:val.t,by:String(val.by||"").slice(0,24)}; return true; }
+  return false;
+}
+
+function heal(i){
+  // Etter første synk: send det vi veit som er nyare enn det denne brokeren har
+  Object.keys(state).forEach(id=>{ const have=brokerSeen[i][id]; if(!have || have.t<state[id].t) publishTo(i,id,state[id]); });
+}
+
+function updateConn(){
+  const n=connected.filter(Boolean).length, box=document.getElementById("conn"), txt=document.getElementById("connText");
+  if(n>0){ box.dataset.s="ok"; txt.textContent="Synkronisert"; }
+  else if(!navigator.onLine){ box.dataset.s="off"; txt.textContent="Ikkje nett"; }
+  else { box.dataset.s= box.dataset.s==="ok"?"off":box.dataset.s; if(box.dataset.s!=="wait") txt.textContent="Fråkopla"; }
+  document.getElementById("diag").textContent = `Synk: ${BROKERS.map((b,i)=>b.name+(connected[i]?" ✓":" ✗")).join(" · ")} · rom ${ROOM.slice(-10)}`;
+}
+
+function connect(){
+  if(typeof mqtt==="undefined"){ document.getElementById("connText").textContent="Synk manglar"; return; }
+  BROKERS.forEach((b,i)=>{
+    const c=mqtt.connect(b.url,{clientId:"pk_"+Math.random().toString(16).slice(2,12),keepalive:30,reconnectPeriod:2500,connectTimeout:10000,clean:true});
+    clients[i]=c;
+    c.on("connect",()=>{ connected[i]=true; updateConn();
+      c.subscribe(`${ROOM}/s/+`,{qos:1},()=>{ setTimeout(()=>heal(i),2500); }); });
+    c.on("message",(topic,payload)=>{
+      const id=topic.slice(topic.lastIndexOf("/")+1); if(!payload || !payload.length) return;
+      let v; try{ v=JSON.parse(payload.toString()) }catch(e){ return }
+      if(!v || typeof v.t!=="number") return;
+      const prev=brokerSeen[i][id]; if(!prev || v.t>=prev.t) brokerSeen[i][id]=v;
+      if(accept(id,v)){ renderAll(); saveLocal(); }
+    });
+    c.on("close",()=>{ connected[i]=false; updateConn(); });
+    c.on("offline",()=>{ connected[i]=false; updateConn(); });
+    c.on("error",()=>{});
+  });
+  setTimeout(()=>{ const box=document.getElementById("conn"); if(box.dataset.s==="wait"){ box.dataset.s="off"; updateConn(); } },12000);
+}
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") clients.forEach((c,i)=>{ if(c && !connected[i]) try{ c.reconnect() }catch(e){} }); });
+window.addEventListener("online",()=>{ clients.forEach((c,i)=>{ if(c && !connected[i]) try{ c.reconnect() }catch(e){} }); updateConn(); });
+window.addEventListener("offline",updateConn);
+
+/* ---------- handlingar ---------- */
+function setSpot(id,o){
+  const cur=state[id]; const t=Math.max(Date.now(), cur ? cur.t+1 : 0);
+  const val={o:o?1:0,t,by:me||""}; state[id]=val; renderAll(); saveLocal(); publishAll(id,val);
+  const g=spotEls[id]; if(g){ g.classList.add("flash"); setTimeout(()=>g.classList.remove("flash"),350); }
+  if(navigator.vibrate) try{ navigator.vibrate(12) }catch(e){}
+}
+function toggle(id){
+  const was=isOcc(id); setSpot(id,!was);
+  const s=spotById[id]; showToast(`${s.lot.tag} nr ${s.num} er no ${was?"ledig":"oppteken"}`, ()=>setSpot(id,was));
+}
+let toastTimer=null;
+function showToast(msg,undo){
+  const host=document.getElementById("toastHost"); host.innerHTML="";
+  const d=document.createElement("div"); d.className="toast"; d.setAttribute("role","status");
+  const span=document.createElement("span"); span.textContent=msg; d.appendChild(span);
+  if(undo){ const b=document.createElement("button"); b.type="button"; b.textContent="Angre"; b.onclick=()=>{ undo(); host.innerHTML=""; }; d.appendChild(b); }
+  host.appendChild(d); clearTimeout(toastTimer); toastTimer=setTimeout(()=>{ host.innerHTML=""; },4500);
+}
+
+/* ---------- namn + innstillingar ---------- */
+function renderNamebar(){
+  const host=document.getElementById("namebarHost");
+  if(me){ host.innerHTML=""; return; }
+  host.innerHTML=`<div class="namebar"><div style="flex:1;min-width:0"><p>Kva heiter du? (så dei andre ser kven som endra)</p>
+    <div style="display:flex;gap:8px"><input type="text" id="nameQuick" maxlength="24" placeholder="Namn" autocomplete="given-name"><button class="btn primary" id="nameOk" type="button">OK</button></div></div></div>`;
+  const inp=document.getElementById("nameQuick");
+  const ok=()=>{ const v=inp.value.trim(); if(!v) { inp.focus(); return; } setName(v); };
+  document.getElementById("nameOk").onclick=ok; inp.addEventListener("keydown",e=>{ if(e.key==="Enter") ok(); });
+}
+function setName(v){ me=v.slice(0,24); lsSet(LS_NAME,me); document.getElementById("nameInput").value=me; renderNamebar(); }
+document.getElementById("nameInput").value=me;
+document.getElementById("nameInput").addEventListener("change",e=>setName(e.target.value.trim()));
+
+document.getElementById("shareBtn").addEventListener("click",async()=>{
+  const url=location.href.split("#")[0];
+  try{ if(navigator.share){ await navigator.share({title:"Parkering HSMK",text:"Parkeringsoversikt for loppemarknaden",url}); return; } }catch(e){ return; }
+  try{ await navigator.clipboard.writeText(url); showToast("Lenkja er kopiert"); }catch(e){ showToast(url); }
+});
+
+function buildReset(){
+  const row=document.getElementById("resetRow");
+  const make=(label,ids)=>{ const b=document.createElement("button"); b.type="button"; b.className="btn danger"; b.textContent=label; let armed=null;
+    b.onclick=()=>{ if(!armed){ b.classList.add("armed"); b.textContent="Trykk igjen for å nullstille"; armed=setTimeout(()=>{ armed=null; b.classList.remove("armed"); b.textContent=label; },3000); return; }
+      clearTimeout(armed); armed=null; b.classList.remove("armed"); b.textContent=label;
+      ids.forEach(id=>{ if(isOcc(id)) setSpot(id,false); }); showToast("Nullstilt"); };
+    row.appendChild(b); };
+  LOTS.forEach(L=>make("Nullstill "+L.tag, spotsByLot[L.id].map(s=>s.id)));
+  make("Nullstill alle", spots.map(s=>s.id));
+}
+
+/* ---------- start ---------- */
+buildSummary(); buildLots(); buildReset(); renderNamebar(); renderAll(); updateConn(); connect();
+</script>
+</body>
+</html>
