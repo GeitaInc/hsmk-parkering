@@ -234,7 +234,7 @@ const LOTS = [
            {x:196, y:628, a:90, n:1, side:-1, sw:34, sd:56} ] // 10: inntil bygget i sør
   },
   { id:"p3", tag:"P3", name:"Ved vakta", small:true,
-    rows:[ {x:14, y:288, a:0, n:2, side:1, sw:58, sd:34} ]   // på langs langs nordkanten, 1 vest → 2 aust (ved vakta)
+    rows:[ {x:36, y:246, a:0, n:2, side:1, sw:58, sd:34} ]   // på langs i lomma mot skogkanten, 1 = den opphavlege, 2 = ny aust for han
   },
   { id:"hc", tag:"HC", name:"HC-plassar", hc:true, small:true,
     rows:[ {x:134, y:400, a:0, n:2, side:-1, sw:48, sd:52} ]  // nordsida av det mørke bygget
@@ -246,12 +246,13 @@ function drawBackdrop(svg){
   el("path",{class:"road",d:"M236 -62 L392 38","stroke-width":28},svg);
   // trekroner
   [[20,-20,14],[60,-4,20],[110,10,18],[140,-26,14],[24,40,18],[80,60,22],[130,70,16],[30,110,16],[90,130,20],[140,150,14],
-   [20,180,18],[70,200,16],[120,220,20],[30,250,14],[248,228,16],[284,214,14],[228,256,12],[334,222,10],
+   [20,180,18],[70,200,14],[120,214,16],[12,262,10],[248,228,16],[284,214,14],[228,256,12],[334,222,10],
    [12,500,10],[30,590,14],[60,670,14],[100,690,10],[200,-30,12]]
    .forEach(([cx,cy,r])=>el("circle",{class:"tree",cx,cy,r},svg));
   // asfalt: P1 med utkøyring mot Stigengbakken og nedkøyring til plassen
   el("polygon",{class:"asph",points:"160,12 356,12 360,8 360,202 160,202"},svg);
   el("polygon",{class:"asph",points:"160,196 208,196 208,292 160,292"},svg);
+  el("polygon",{class:"asph",points:"30,240 162,240 162,290 30,290"},svg);   // lomme for P3
   // plassen + P2 + vegen langs skulen
   el("polygon",{class:"asph",points:"8,284 302,284 302,700 122,700 0,432 0,300"},svg);
   // bygg og grøntområde
