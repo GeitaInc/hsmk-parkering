@@ -234,7 +234,7 @@ const LOTS = [
            {x:196, y:628, a:90, n:1, side:-1, sw:34, sd:56} ] // 10: inntil bygget i sør
   },
   { id:"p3", tag:"P3", name:"Ved vakta", small:true,
-    rows:[ {x:40, y:288, a:0, n:1, side:1} ]
+    rows:[ {x:14, y:288, a:0, n:2, side:1, sw:58, sd:34} ]   // på langs langs nordkanten, 1 vest → 2 aust (ved vakta)
   },
   { id:"hc", tag:"HC", name:"HC-plassar", hc:true, small:true,
     rows:[ {x:134, y:400, a:0, n:2, side:-1, sw:48, sd:52} ]  // nordsida av det mørke bygget
@@ -265,9 +265,9 @@ function drawBackdrop(svg){
   const t1=el("text",{class:"paint",x:280,y:104},svg); t1.textContent="P1";
   const t2=el("text",{class:"paint",x:160,y:540},svg); t2.textContent="P2";
   // vaktposten
-  const v=el("g",{class:"vakt",transform:"translate(106 318)"},svg);
+  const v=el("g",{class:"vakt",transform:"translate(146 314)"},svg);
   el("circle",{r:7},v);
-  const vt=el("text",{x:0,y:20},v); vt.textContent="vakt";
+  const vt=el("text",{x:0,y:19},v); vt.textContent="vakt";
   // kompass
   const c=el("g",{class:"compass",transform:"translate(22 -8)"},svg);
   el("path",{d:"M0 -14 L5 0 L0 -3 L-5 0 Z"},c);
@@ -324,10 +324,14 @@ function buildMap(){
     const y0 = side>0?0:-sd;
     el("rect",{class:"bay",x:s.k*sw,y:y0,width:sw,height:sd},rg);
     el("rect",{class:"carbody",x:s.k*sw+4,y:y0+5,width:sw-8,height:sd-10,rx:6},rg);
-    const gy = side>0 ? y0+sd-19 : y0+9;
-    el("rect",{class:"glass",x:s.k*sw+7,y:gy,width:sw-14,height:10,rx:3},rg);
+    if(sw>sd){ // bilen ligg på langs av rada
+      el("rect",{class:"glass",x:s.k*sw+sw-19,y:y0+7,width:10,height:sd-14,rx:3},rg);
+    } else {
+      const gy = side>0 ? y0+sd-19 : y0+9;
+      el("rect",{class:"glass",x:s.k*sw+7,y:gy,width:sw-14,height:10,rx:3},rg);
+    }
     const [cx,cy]=rowPoint(r,(s.k+.5)*sw,side*sd/2);
-    const t=el("text",{class:"n",x:cx,y:cy},g); t.textContent = s.lot.hc ? "HC"+s.num : (spotsByLot[s.lot.id].length===1 ? s.lot.tag : s.num);
+    const t=el("text",{class:"n",x:cx,y:cy},g); t.textContent = s.lot.hc ? "HC"+s.num : (s.lot.small ? s.lot.tag+"-"+s.num : s.num);
     spotEls[s.id]=g;
   });
   svg.addEventListener("click",e=>{ const g=e.target.closest(".spot"); if(g) toggle(g.dataset.id); });
