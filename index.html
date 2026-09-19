@@ -18,6 +18,7 @@
   --asphalt:#454a51; --asphalt-edge:#2f3338; --paint:#f3f3ee;
   --free:#1e9a53; --free-soft:#d8f1e2; --occ:#d23f3a; --occ-soft:#f8dcda; --warn:#d99100; --warn-soft:#fbeccb;
   --car:#c9362f; --car-glass:#f2c4c1;
+  --hc-soft:#d9e6f7; --grass:#cfdcc6; --tree:#a9c29d; --roof:#a4acb5; --roof-dark:#5d646c; --road:#7b8088;
   --shadow:0 1px 2px rgba(10,30,60,.08),0 4px 14px rgba(10,30,60,.06);
 }
 @media (prefers-color-scheme: dark){
@@ -27,6 +28,7 @@
     --asphalt:#2c3137; --asphalt-edge:#1b1f24; --paint:#dcdcd4;
     --free:#3cc378; --free-soft:#163826; --occ:#f0625c; --occ-soft:#3d1c1b; --warn:#f0b43a; --warn-soft:#3b2d10;
     --car:#e0544d; --car-glass:#5a2523;
+    --hc-soft:#1a2c46; --grass:#17231b; --tree:#1f3325; --roof:#39414a; --roof-dark:#262b31; --road:#353a41;
     --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);
   }
 }
@@ -77,16 +79,17 @@ header.top{display:flex;align-items:center;gap:12px;padding-top:calc(12px + env(
 .lotcard[data-k=full]{border-color:var(--occ)}
 .lotcard[data-k=full] .num{color:var(--occ)}
 
-/* Lots */
-.hint{margin:4px 0 12px;color:var(--ink-2);font-size:13px}
-.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink-2);margin:0 0 10px}
-.legend span{display:inline-flex;align-items:center;gap:6px}
-.legend b{display:inline-block;width:14px;height:14px;border-radius:3px}
-section.lot{margin:0 0 22px;scroll-margin-top:130px}
-section.lot h2{display:flex;align-items:center;gap:8px;margin:0 0 8px;font-size:17px;font-weight:800}
-section.lot h2 .tag{background:var(--sign);color:var(--sign-ink);font-weight:900;font-size:14px;border-radius:5px;padding:3px 7px 1px}
-section.lot h2 .cnt{margin-left:auto;font-size:14px;font-weight:600;color:var(--ink-2)}
-.mapbox{background:var(--surface);border-radius:12px;box-shadow:var(--shadow);padding:8px;overflow:hidden}
+/* Map */
+.mapsec{margin:0 0 16px;scroll-margin-top:150px}
+.maphead{display:flex;align-items:baseline;gap:12px;margin:2px 0 8px}
+.maphead h2{margin:0;font-size:17px;font-weight:800}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--ink-2);margin-left:auto}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend b{display:inline-block;width:13px;height:13px;border-radius:3px}
+.lg-free{background:var(--free-soft);box-shadow:inset 0 0 0 1.5px var(--free)}
+.lg-occ{background:var(--car)}
+.hint{margin:8px 0 0;color:var(--ink-2);font-size:13px}
+.mapbox{background:var(--grass);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
 svg.map{display:block;width:100%;height:auto;user-select:none;-webkit-user-select:none}
 .spot{cursor:pointer}
 .spot .bay{fill:var(--free-soft);stroke:var(--paint);stroke-width:1.6}
@@ -94,13 +97,28 @@ svg.map{display:block;width:100%;height:auto;user-select:none;-webkit-user-selec
 .spot .glass{fill:var(--car-glass);opacity:0;transition:opacity .15s}
 .spot.occ .bay{fill:var(--occ-soft)}
 .spot.occ .carbody,.spot.occ .glass{opacity:1}
-.spot .n{font-size:12px;font-weight:800;fill:var(--free);pointer-events:none;text-anchor:middle;dominant-baseline:central}
+.spot .n{font-size:13px;font-weight:800;fill:var(--free);pointer-events:none;text-anchor:middle;dominant-baseline:central}
+.spot.hc .bay{fill:var(--hc-soft)}
+.spot.hc .n{fill:var(--sign);font-size:12px}
+@media (prefers-color-scheme: dark){.spot.hc .n{fill:#8fb8ef}}
 .spot.occ .n{fill:#fff}
 .spot.flash .bay{stroke:var(--sign);stroke-width:3.5}
-.asph{fill:var(--asphalt);stroke:var(--asphalt-edge);stroke-width:2}
-.maplabel{font-size:12px;font-weight:700;fill:var(--ink-2);text-anchor:middle}
-.maplabel.onasph{fill:var(--paint);opacity:.85}
-.arrow{fill:var(--paint);opacity:.8}
+.asph{fill:var(--asphalt)}
+.road{fill:none;stroke:var(--road);stroke-linecap:butt}
+.bldg{fill:var(--roof)}
+.bldg.dark{fill:var(--roof-dark)}
+.tree{fill:var(--tree)}
+.maplabel{font-size:12px;font-weight:700;fill:var(--ink-2);text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.maplabel.onroad{fill:#fff;opacity:.9;font-size:11px;letter-spacing:.04em}
+.maplabel.onroof{fill:var(--ink);opacity:.7;letter-spacing:.08em;text-transform:uppercase;font-size:11px}
+.paint{fill:var(--paint);opacity:.55;font-weight:900;font-size:26px;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.compass text{font-size:11px;font-weight:900;fill:var(--ink);text-anchor:middle}
+.compass path{fill:var(--occ)}
+
+/* HC line in summary */
+.hcline{grid-column:1/-1;all:unset;grid-column:1/-1;cursor:pointer;display:flex;align-items:center;gap:8px;background:var(--surface);border-radius:10px;box-shadow:var(--shadow);padding:6px 10px 5px;font-size:13px;color:var(--ink-2)}
+.hcline .tag{background:var(--sign);color:var(--sign-ink);font-weight:900;font-size:12px;border-radius:5px;padding:2px 6px 0;line-height:1.3}
+.hcline b{color:var(--ink);font-size:15px}
 
 /* Log */
 .panel{background:var(--surface);border-radius:12px;box-shadow:var(--shadow);padding:12px 14px;margin:0 0 14px}
@@ -153,13 +171,17 @@ input[type=text]{font:inherit;font-size:16px;padding:10px 12px;border-radius:8px
 
   <div id="namebarHost"></div>
 
-  <p class="hint">Trykk på ein plass når ein bil parkerer. Trykk igjen når han køyrer. Alle ser endringa med ein gong.</p>
-  <div class="legend" aria-hidden="true">
-    <span><b style="background:var(--free-soft);outline:1.5px solid var(--free)"></b>Ledig</span>
-    <span><b style="background:var(--car)"></b>Oppteken</span>
-  </div>
-
-  <div id="lots"></div>
+  <section class="mapsec" id="kart">
+    <div class="maphead">
+      <h2>Kart</h2>
+      <div class="legend" aria-hidden="true">
+        <span><b class="lg-free"></b>Ledig</span>
+        <span><b class="lg-occ"></b>Oppteken</span>
+      </div>
+    </div>
+    <div class="mapbox" id="mapbox"></div>
+    <p class="hint">Trykk på ein plass når ein bil parkerer, og trykk igjen når han køyrer. Alle ser endringa med ein gong.</p>
+  </section>
 
   <div class="panel">
     <h3>Siste endringar</h3>
@@ -187,32 +209,56 @@ input[type=text]{font:inherit;font-size:16px;padding:10px 12px;border-radius:8px
 <script>
 "use strict";
 /* ============================================================
-   LAYOUT – parkeringane. Kvar rad = plassar side om side langs ei linje.
+   KART – teikna etter flyfoto frå Tarjei 19.09.2026 (nord opp, ikkje i skala).
+   Kvar rad = plassar side om side langs ei linje.
    x,y = startpunkt · a = vinkel (grader) · n = tal plassar
-   side = 1 (plassane går «nedover» frå linja) eller -1 (oppover)
+   side = 1: plassane går til venstre for køyreretninga (a=0 → nedover), -1: motsett
    ============================================================ */
-const SW = 34;   // plassbreidd (einingar)
-const SD = 56;   // plassdjupn
+const MAP = { w:360, h:690 };
+const SW = 34, SD = 56;
 
 const LOTS = [
-  { id:"p1", tag:"P1", name:"Parkering 1",
-    outline:[[0,0],[372,0],[372,300],[0,300]],
-    rows:[
-      {x:16, y:10,  a:0, n:10, side:1},
-      {x:16, y:170, a:0, n:10, side:-1},
-      {x:16, y:176, a:0, n:10, side:1},
-    ],
-    labels:[{x:186,y:128,text:"køyrefelt",onAsph:true}, {x:186,y:290,text:"",onAsph:true}]
+  { id:"p1", tag:"P1", name:"Stigengbakken",
+    rows:[ {x:100, y:26,  a:0, n:5, side:1},      // øvre rad, 1–5
+           {x:80,  y:186, a:0, n:5, side:-1} ]    // nedre rad, 6–10
   },
-  { id:"p2", tag:"P2", name:"Parkering 2",
-    outline:[[0,0],[372,0],[372,214],[0,214]],
-    rows:[
-      {x:16, y:10,  a:0, n:10, side:1},
-      {x:16, y:204, a:0, n:10, side:-1},
-    ],
-    labels:[{x:186,y:112,text:"køyrefelt",onAsph:true}]
+  { id:"p2", tag:"P2", name:"Ved skulen",
+    rows:[ {x:60, y:350, a:63, n:9, side:1, sw:32, sd:54} ]   // langs vestkanten, 1 nord → 9 sør
+  },
+  { id:"hc", tag:"HC", name:"HC-plassar", hc:true,
+    rows:[ {x:150, y:386, a:0, n:2, side:-1, sw:48, sd:52} ]  // nordsida av det mørke bygget
   }
 ];
+
+function drawBackdrop(svg){
+  // vegen Stigengbakken
+  el("path",{class:"road",d:"M236 -12 L372 104","stroke-width":30},svg);
+  // trekroner
+  [[14,40,16],[12,120,18],[16,210,17],[8,275,12],[110,232,20],[150,248,16],[190,226,22],[232,250,18],[272,222,16],
+   [318,150,17],[340,190,16],[344,112,12],[20,470,13],[40,560,15],[70,640,16],[110,672,14],[282,208,10]]
+   .forEach(([cx,cy,r])=>el("circle",{class:"tree",cx,cy,r},svg));
+  // asfalt: P1 med innkøyring frå Stigengbakken, nedkøyring til plassen
+  el("polygon",{class:"asph",points:"28,16 282,16 300,34 300,196 84,196 84,292 30,292"},svg);
+  el("polygon",{class:"asph",points:"262,4 300,34 282,16"},svg);
+  // plassen + P2 + vegen langs skulen
+  el("polygon",{class:"asph",points:"30,284 302,284 302,690 140,690 132,655 2,378 30,338"},svg);
+  // bygg
+  el("polygon",{class:"bldg dark",points:"150,390 254,390 254,454 150,454"},svg);
+  el("polygon",{class:"tree",points:"206,456 262,456 262,628 226,632"},svg);
+  el("polygon",{class:"bldg",points:"172,640 262,640 262,690 182,690"},svg);
+  el("polygon",{class:"bldg",points:"302,232 360,232 360,690 302,690"},svg);
+  // tekst
+  lbl(svg,322,54,"STIGENGBAKKEN","maplabel onroad",40.5);
+  lbl(svg,331,470,"Skulen","maplabel onroof",90);
+  // måla feltnamn på asfalten
+  const t1=el("text",{class:"paint",x:186,y:106},svg); t1.textContent="P1";
+  const t2=el("text",{class:"paint",x:168,y:520},svg); t2.textContent="P2";
+  // kompass
+  const c=el("g",{class:"compass",transform:"translate(16 314)"},svg);
+  el("path",{d:"M0 -14 L5 0 L0 -3 L-5 0 Z"},c);
+  const n=el("text",{x:0,y:12},c); n.textContent="N";
+}
+function lbl(svg,x,y,text,cls,rot){ const t=el("text",{class:cls,x,y,transform:rot?`rotate(${rot} ${x} ${y})`:""},svg); t.textContent=text; return t; }
 
 /* ============================================================ SYNK */
 const params = new URLSearchParams(location.search);
@@ -230,69 +276,65 @@ let me = (lsGet(LS_NAME) || "").trim();
 /** state[spotId] = {o:0|1, t:ms, by:string} */
 let state = {};
 try{ state = JSON.parse(lsGet(LS_STATE) || "{}") || {} }catch(e){ state = {} }
-const brokerSeen = BROKERS.map(()=>({}));  // kva kvar broker har fortalt oss
+const brokerSeen = BROKERS.map(()=>({}));
 const clients = [];
 const connected = BROKERS.map(()=>false);
 
 /* ---------- geometri ---------- */
 const rad = d => d*Math.PI/180;
 function rowPoint(r,u,v){ const c=Math.cos(rad(r.a)), s=Math.sin(rad(r.a)); return [r.x+u*c-v*s, r.y+u*s+v*c]; }
-const spots = [];          // {id, lot, num, row, k}
+const spots = [];
 const spotsByLot = {};
 LOTS.forEach(L=>{
   spotsByLot[L.id]=[]; let num=1;
   L.rows.forEach(r=>{ for(let k=0;k<r.n;k++){ const s={id:L.id+"-"+num, lot:L, num, row:r, k}; spots.push(s); spotsByLot[L.id].push(s); num++; } });
 });
 const spotById = Object.fromEntries(spots.map(s=>[s.id,s]));
+const spotName = s => s.lot.hc ? `HC ${s.num}` : `${s.lot.tag} nr ${s.num}`;
 
 /* ---------- teikning ---------- */
 const NS="http://www.w3.org/2000/svg";
 function el(tag,attrs,parent){ const e=document.createElementNS(NS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(parent) parent.appendChild(e); return e; }
 const spotEls = {};
 
-function buildLots(){
-  const host=document.getElementById("lots");
-  LOTS.forEach(L=>{
-    const sec=document.createElement("section"); sec.className="lot"; sec.id="lot-"+L.id;
-    sec.innerHTML=`<h2><span class="tag">${L.tag}</span><span>${L.name}</span><span class="cnt" id="cnt-${L.id}"></span></h2><div class="mapbox"></div>`;
-    host.appendChild(sec);
-    // bounds
-    const pts=[...L.outline];
-    L.rows.forEach(r=>{ const side=r.side||1; [[0,0],[r.n*SW,0],[0,side*SD],[r.n*SW,side*SD]].forEach(([u,v])=>pts.push(rowPoint(r,u,v))); });
-    (L.labels||[]).forEach(l=>pts.push([l.x,l.y]));
-    const xs=pts.map(p=>p[0]), ys=pts.map(p=>p[1]);
-    const pad=6, minX=Math.min(...xs)-pad, minY=Math.min(...ys)-pad, W=Math.max(...xs)-minX+pad, H=Math.max(...ys)-minY+pad;
-    const svg=el("svg",{class:"map",viewBox:`${minX} ${minY} ${W} ${H}`,role:"group","aria-label":`${L.tag} ${L.name}`});
-    sec.querySelector(".mapbox").appendChild(svg);
-    el("polygon",{class:"asph",points:L.outline.map(p=>p.join(",")).join(" ")},svg);
-    (L.labels||[]).forEach(l=>{ if(!l.text) return; const t=el("text",{class:"maplabel"+(l.onAsph?" onasph":""),x:l.x,y:l.y},svg); t.textContent=l.text; });
-    spotsByLot[L.id].forEach(s=>{
-      const r=s.row, side=r.side||1;
-      const g=el("g",{class:"spot",role:"button",tabindex:"0","data-id":s.id},svg);
-      const rg=el("g",{transform:`translate(${r.x} ${r.y}) rotate(${r.a})`},g);
-      const y0 = side>0?0:-SD;
-      el("rect",{class:"bay",x:s.k*SW,y:y0,width:SW,height:SD},rg);
-      // bil: kropp + frontrute (fronten mot køyrefeltet, dvs. borte frå linja)
-      el("rect",{class:"carbody",x:s.k*SW+4,y:y0+5,width:SW-8,height:SD-10,rx:6},rg);
-      const gy = side>0 ? y0+SD-19 : y0+9;
-      el("rect",{class:"glass",x:s.k*SW+7,y:gy,width:SW-14,height:10,rx:3},rg);
-      const [cx,cy]=rowPoint(r,(s.k+.5)*SW,side*SD/2);
-      const t=el("text",{class:"n",x:cx,y:cy},g); t.textContent=s.num;
-      spotEls[s.id]=g;
-    });
-    svg.addEventListener("click",e=>{ const g=e.target.closest(".spot"); if(g) toggle(g.dataset.id); });
-    svg.addEventListener("keydown",e=>{ if((e.key==="Enter"||e.key===" ") && e.target.classList.contains("spot")){ e.preventDefault(); toggle(e.target.dataset.id); } });
+function buildMap(){
+  const host=document.getElementById("mapbox");
+  const svg=el("svg",{class:"map",viewBox:`0 0 ${MAP.w} ${MAP.h}`,role:"group","aria-label":"Kart over parkeringsplassane"});
+  host.appendChild(svg);
+  drawBackdrop(svg);
+  spots.forEach(s=>{
+    const r=s.row, side=r.side||1, sw=r.sw||SW, sd=r.sd||SD;
+    const g=el("g",{class:"spot"+(s.lot.hc?" hc":""),role:"button",tabindex:"0","data-id":s.id},svg);
+    const rg=el("g",{transform:`translate(${r.x} ${r.y}) rotate(${r.a})`},g);
+    const y0 = side>0?0:-sd;
+    el("rect",{class:"bay",x:s.k*sw,y:y0,width:sw,height:sd},rg);
+    el("rect",{class:"carbody",x:s.k*sw+4,y:y0+5,width:sw-8,height:sd-10,rx:6},rg);
+    const gy = side>0 ? y0+sd-19 : y0+9;
+    el("rect",{class:"glass",x:s.k*sw+7,y:gy,width:sw-14,height:10,rx:3},rg);
+    const [cx,cy]=rowPoint(r,(s.k+.5)*sw,side*sd/2);
+    const t=el("text",{class:"n",x:cx,y:cy},g); t.textContent = s.lot.hc ? "HC"+s.num : s.num;
+    spotEls[s.id]=g;
   });
+  svg.addEventListener("click",e=>{ const g=e.target.closest(".spot"); if(g) toggle(g.dataset.id); });
+  svg.addEventListener("keydown",e=>{ if((e.key==="Enter"||e.key===" ") && e.target.classList.contains("spot")){ e.preventDefault(); toggle(e.target.dataset.id); } });
 }
+
+function scrollToMap(){ document.getElementById("kart").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"}); }
 
 function buildSummary(){
   const host=document.getElementById("summary");
   LOTS.forEach(L=>{
-    const b=document.createElement("button"); b.type="button"; b.className="lotcard"; b.id="card-"+L.id;
-    b.innerHTML=`<div class="row1"><span class="tag">${L.tag}</span><span class="nm">${L.name}</span></div>
-      <div class="big"><span class="num" id="free-${L.id}">–</span><span class="of" id="of-${L.id}">ledige</span><span class="chip" id="chip-${L.id}" data-k="ok">Ledig</span></div>
-      <div class="bar"><i id="bar-${L.id}" style="width:0"></i></div>`;
-    b.addEventListener("click",()=>document.getElementById("lot-"+L.id).scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"}));
+    const b=document.createElement("button"); b.type="button"; b.id="card-"+L.id;
+    if(L.hc){
+      b.className="hcline";
+      b.innerHTML=`<span class="tag">HC</span><span><b id="free-${L.id}">–</b> <span id="of-${L.id}">ledige</span></span><span class="chip" id="chip-${L.id}" data-k="ok">Ledig</span>`;
+    } else {
+      b.className="lotcard";
+      b.innerHTML=`<div class="row1"><span class="tag">${L.tag}</span><span class="nm">${L.name}</span></div>
+        <div class="big"><span class="num" id="free-${L.id}">–</span><span class="of" id="of-${L.id}">ledige</span><span class="chip" id="chip-${L.id}" data-k="ok">Ledig</span></div>
+        <div class="bar"><i id="bar-${L.id}" style="width:0"></i></div>`;
+    }
+    b.addEventListener("click",scrollToMap);
     host.appendChild(b);
   });
 }
@@ -300,18 +342,18 @@ function buildSummary(){
 function isOcc(id){ return !!(state[id] && state[id].o); }
 
 function renderSpot(id){ const g=spotEls[id]; if(!g) return; const o=isOcc(id); g.classList.toggle("occ",o);
-  const s=spotById[id]; g.setAttribute("aria-label",`${s.lot.tag} plass ${s.num}: ${o?"oppteken":"ledig"}`); }
+  g.setAttribute("aria-label",`${spotName(spotById[id])}: ${o?"oppteken":"ledig"}`); }
 
 function renderCounts(){
   LOTS.forEach(L=>{
     const list=spotsByLot[L.id], total=list.length, occ=list.filter(s=>isOcc(s.id)).length, free=total-occ;
-    const k = free===0 ? "full" : (free <= Math.max(2, Math.round(total*0.1)) ? "warn" : "ok");
+    const k = free===0 ? "full" : (!L.hc && free <= Math.max(2, Math.round(total*0.1)) ? "warn" : "ok");
     document.getElementById("free-"+L.id).textContent=free;
+    const chip=document.getElementById("chip-"+L.id); chip.dataset.k=k; chip.textContent= k==="full"?"Fullt":k==="warn"?"Nesten fullt":"Ledig";
+    if(L.hc){ document.getElementById("of-"+L.id).textContent=`av ${total} ledige HC-plassar`; return; }
     document.getElementById("of-"+L.id).innerHTML=`ledige<br>av ${total}`;
     document.getElementById("bar-"+L.id).style.width=(total?occ/total*100:0)+"%";
-    const chip=document.getElementById("chip-"+L.id); chip.dataset.k=k; chip.textContent= k==="full"?"Fullt":k==="warn"?"Nesten fullt":"Ledig";
     document.getElementById("card-"+L.id).dataset.k=k;
-    document.getElementById("cnt-"+L.id).textContent=`${free} ledige, ${occ} opptekne`;
   });
 }
 
@@ -322,11 +364,12 @@ function renderLog(){
   const ul=document.getElementById("log");
   if(!items.length){ ul.innerHTML=`<li><p class="empty">Ingen endringar enno.</p></li>`; return; }
   ul.innerHTML=items.map(([id,v])=>{ const s=spotById[id];
-    return `<li><time>${hhmm(v.t)}</time><span>${s.lot.tag} nr ${s.num} → <span class="${v.o?"st-occ":"st-free"}">${v.o?"oppteken":"ledig"}</span></span><span class="who">${esc(v.by||"")}</span></li>`; }).join("");
+    return `<li><time>${hhmm(v.t)}</time><span>${spotName(s)} → <span class="${v.o?"st-occ":"st-free"}">${v.o?"oppteken":"ledig"}</span></span><span class="who">${esc(v.by||"")}</span></li>`; }).join("");
 }
 
 let renderQueued=false;
-function renderAll(){ if(renderQueued) return; renderQueued=true; requestAnimationFrame(()=>{ renderQueued=false; spots.forEach(s=>renderSpot(s.id)); renderCounts(); renderLog(); }); }
+function renderNow(){ renderQueued=false; spots.forEach(s=>renderSpot(s.id)); renderCounts(); renderLog(); }
+function renderAll(){ if(renderQueued) return; renderQueued=true; requestAnimationFrame(renderNow); }
 let saveTimer=null;
 function saveLocal(){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>lsSet(LS_STATE,JSON.stringify(state)),300); }
 
@@ -343,8 +386,7 @@ function accept(id,val){
 }
 
 function heal(i){
-  // Etter første synk: send det vi veit som er nyare enn det denne brokeren har
-  Object.keys(state).forEach(id=>{ const have=brokerSeen[i][id]; if(!have || have.t<state[id].t) publishTo(i,id,state[id]); });
+  Object.keys(state).forEach(id=>{ if(!spotById[id]) return; const have=brokerSeen[i][id]; if(!have || have.t<state[id].t) publishTo(i,id,state[id]); });
 }
 
 function updateConn(){
@@ -375,7 +417,7 @@ function connect(){
   });
   setTimeout(()=>{ const box=document.getElementById("conn"); if(box.dataset.s==="wait"){ box.dataset.s="off"; updateConn(); } },12000);
 }
-document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") clients.forEach((c,i)=>{ if(c && !connected[i]) try{ c.reconnect() }catch(e){} }); });
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible"){ renderNow(); clients.forEach((c,i)=>{ if(c && !connected[i]) try{ c.reconnect() }catch(e){} }); } });
 window.addEventListener("online",()=>{ clients.forEach((c,i)=>{ if(c && !connected[i]) try{ c.reconnect() }catch(e){} }); updateConn(); });
 window.addEventListener("offline",updateConn);
 
@@ -388,7 +430,7 @@ function setSpot(id,o){
 }
 function toggle(id){
   const was=isOcc(id); setSpot(id,!was);
-  const s=spotById[id]; showToast(`${s.lot.tag} nr ${s.num} er no ${was?"ledig":"oppteken"}`, ()=>setSpot(id,was));
+  showToast(`${spotName(spotById[id])} er no ${was?"ledig":"oppteken"}`, ()=>setSpot(id,was));
 }
 let toastTimer=null;
 function showToast(msg,undo){
@@ -431,7 +473,7 @@ function buildReset(){
 }
 
 /* ---------- start ---------- */
-buildSummary(); buildLots(); buildReset(); renderNamebar(); renderAll(); updateConn(); connect();
+buildSummary(); buildMap(); buildReset(); renderNamebar(); renderNow(); updateConn(); connect();
 </script>
 </body>
 </html>
