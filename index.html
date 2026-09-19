@@ -493,14 +493,15 @@ function buildReset(){
 }
 
 /* ---------- automatisk oppdatering av sida ---------- */
-const BUILD = "2026-09-19-8";
+const BUILD = 9;
 let checking=false;
 async function checkUpdate(){
   if(checking) return; checking=true;
   try{
     const r=await fetch(location.pathname+"?_="+Date.now(),{cache:"no-store"});
-    if(r.ok){ const m=(await r.text()).match(/const BUILD = "([^"]+)"/);
-      if(m && m[1]!==BUILD){ lsSet(LS_STATE,JSON.stringify(state)); const u=new URL(location.href); u.searchParams.set("v",m[1]); location.replace(u.toString()); return; } }
+    if(r.ok){ const m=(await r.text()).match(/const BUILD = (\d+);/);
+      // berre last om når serveren har ein NYARE versjon (hindrar lykkjer medan CDN-en oppdaterer seg)
+      if(m && Number(m[1])>BUILD){ lsSet(LS_STATE,JSON.stringify(state)); const u=new URL(location.href); u.searchParams.set("v",m[1]); location.replace(u.toString()); return; } }
   }catch(e){}
   checking=false;
 }
